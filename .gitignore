@@ -1,0 +1,8 @@
+.env
+.terraform/
+.tfstate
+.tfstate.backup
+.terraform.lock.hcl
+/setup/
+.tfstate.my-backup
+.tfstate.1744038299.backup
