@@ -2,7 +2,7 @@
 resource "aws_vpc" "custom-vpc" {
   cidr_block = var.vpc_cidrs
   tags = {
-    Name = "${local.name}--vpc"
+    Name = var.name
   }
 }
 
@@ -12,7 +12,7 @@ resource "aws_subnet" "public_subnet" {
   cidr_block              = var.public_subnet_cidrs
   map_public_ip_on_launch = true
   tags = {
-    Name : "${local.name}--public subnet"
+    Name : var.name
   }
 }
 
@@ -23,15 +23,15 @@ resource "aws_subnet" "private_subnet" {
   cidr_block        = var.private_subnet_cidrs[count.index]
   availability_zone = var.subnet_availability_zones[count.index]
   tags = {
-    Name : "${local.name}--private-subnet -${count.index + 1}"
+    Name : "${var.name}--${count.index + 1}"
   }
 }
 
 # To group together the two private subnets for RDS deployment
 resource "aws_db_subnet_group" "db_subnet_group" {
-  name        = "${local.name}--private subnet group"
+  name        = var.name
   subnet_ids  = [aws_subnet.private_subnet[0].id, aws_subnet.private_subnet[1].id]
-  description = "subnet group to support RDS deployment"
+  description = var.subnet_group_description
 }
 
 # To allow the local network to communicate with the internet
@@ -39,7 +39,7 @@ resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.custom-vpc.id
 
   tags = {
-    Name = "${local.name}--igw"
+    Name = var.name
   }
 }
 
@@ -53,7 +53,7 @@ resource "aws_route_table" "public_rt" {
   }
 
   tags = {
-    Name = "${local.name}--public route table"
+    Name = var.name
   }
 }
 
@@ -73,7 +73,7 @@ resource "aws_nat_gateway" "ngw" {
   allocation_id = aws_eip.nat_eip.id
   subnet_id     = aws_subnet.public_subnet.id
   tags = {
-    Name : "${local.name}--nat gateway"
+    Name : var.name
   }
   depends_on = [aws_internet_gateway.igw]
 }
@@ -88,7 +88,7 @@ resource "aws_route_table" "private_route_table" {
   }
 
   tags = {
-    Name = "${local.name}--private route table"
+    Name = var.name
   }
 }
 

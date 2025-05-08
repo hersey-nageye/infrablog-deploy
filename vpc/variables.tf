@@ -18,3 +18,13 @@ variable "subnet_availability_zones" {
   type        = list(string)
   description = "The availability zones for the subnets"
 }
+
+variable "name" {
+  type        = string
+  description = "Name tag used for the resource"
+}
+
+variable "subnet_group_description" {
+  type        = string
+  description = "description of the subnet group"
+}
