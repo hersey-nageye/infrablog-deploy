@@ -47,7 +47,7 @@ data "aws_ami" "ubuntu" {
 
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+    values = [var.ami_name_filter]
   }
 
   filter {
@@ -55,7 +55,7 @@ data "aws_ami" "ubuntu" {
     values = ["hvm"]
   }
 
-  owners = ["099720109477"]
+  owners = [var.ami_onwer_id]
 }
 
 # EC2 instance Vault Server will run on
