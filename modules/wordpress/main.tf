@@ -11,11 +11,11 @@ resource "aws_security_group" "wordpress_sg" {
 
 # SSH inbound rule
 resource "aws_vpc_security_group_ingress_rule" "wordpress_ssh" {
-  security_group_id = aws_security_group.wordpress_sg.id
-  cidr_ipv4         = "0.0.0.0/0" # Change so that only traffic from the bastion server is accepted
-  from_port         = 22
-  ip_protocol       = "tcp"
-  to_port           = 22
+  security_group_id            = aws_security_group.wordpress_sg.id
+  referenced_security_group_id = var.sg_id # Denotes Bastion sg it
+  from_port                    = 22
+  ip_protocol                  = "tcp"
+  to_port                      = 22
 }
 
 # Inbound rule for HTTP access
@@ -41,6 +41,10 @@ resource "aws_vpc_security_group_egress_rule" "allow_all_traffic_ipv4" {
   security_group_id = aws_security_group.wordpress_sg.id
   cidr_ipv4         = "0.0.0.0/0"
   ip_protocol       = "-1" # semantically equivalent to all ports
+}
+
+resource "aws_eip" "wordpress_eip" {
+  instance = aws_instance.wordpress_server.id
 }
 
 # Public key for accessing the Wordpress instance

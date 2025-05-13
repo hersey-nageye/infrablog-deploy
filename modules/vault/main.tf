@@ -5,17 +5,17 @@ resource "aws_security_group" "vault_sg" {
   vpc_id      = var.vpc_id
 
   tags = {
-    Name = var.name
+    Name = var.name_tag
   }
 }
 
 # SSH inbound rule
 resource "aws_vpc_security_group_ingress_rule" "vault_ssh" {
-  security_group_id = aws_security_group.vault_sg.id
-  cidr_ipv4         = "0.0.0.0/0" # Change so that only traffic from the bastion server is accepted
-  from_port         = 22
-  ip_protocol       = "tcp"
-  to_port           = 22
+  security_group_id            = aws_security_group.vault_sg.id
+  referenced_security_group_id = var.sg_id # Denotes Bastion sg id
+  from_port                    = 22
+  ip_protocol                  = "tcp"
+  to_port                      = 22
 }
 
 # Inbound rule for Vault UI access
@@ -65,10 +65,10 @@ resource "aws_instance" "vault_server" {
   associate_public_ip_address = true
   subnet_id                   = var.subnet_id
   vpc_security_group_ids      = [aws_security_group.sg_id.id]
-  key_name                    = aws_key_pair.ssh_access_key.id
+  key_name                    = aws_key_pair.ssh_access_key.key_name
 
   tags = {
-    Name : var.name
+    Name : var.name_tag
   }
   lifecycle {
     ignore_changes = [associate_public_ip_address, ami]

@@ -8,7 +8,7 @@ variable "vpc_id" {
   description = "ID for the VPC"
 }
 
-variable "name" {
+variable "name_tag" {
   type        = string
   description = "Name tag for the resource"
 }
@@ -31,11 +31,14 @@ variable "public_key" {
 variable "ami_name_filter" {
   type        = string
   description = "Name pattern for the Ubuntu AMI image"
-  default     = "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"
 }
 
 variable "ami_onwer_id" {
   type        = string
   description = "Owner ID of the Ubuntu AMI"
-  default     = "099720109477"
+}
+
+variable "sg_id" {
+  type        = string
+  description = "SG ID for the Bastion server"
 }
