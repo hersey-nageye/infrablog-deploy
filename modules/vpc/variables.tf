@@ -19,7 +19,7 @@ variable "subnet_availability_zones" {
   description = "The availability zones for the subnets"
 }
 
-variable "name" {
+variable "name_tag" {
   type        = string
   description = "Name tag used for the resource"
 }

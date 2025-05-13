@@ -12,13 +12,13 @@ resource "aws_security_group" "bastion_sg" {
 # SSH inbound rule
 resource "aws_vpc_security_group_ingress_rule" "bastion_ssh" {
   security_group_id = aws_security_group.bastion_sg.id
-  cidr_ipv4         = "0.0.0.0/0"
+  cidr_ipv4         = "172.28.215.169"
   from_port         = 22
   ip_protocol       = "tcp"
   to_port           = 22
 }
 
-# Public key for accessing the Wordpress instance
+# Public key for accessing the Bastion instance
 resource "aws_key_pair" "ssh_access_key" {
   key_name   = var.key_name
   public_key = var.public_key

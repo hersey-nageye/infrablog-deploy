@@ -39,3 +39,8 @@ variable "subnet_id" {
   type        = string
   description = "ID for the subnet"
 }
+
+variable "sg_id" {
+  type        = string
+  description = "Sg id for the bastion server security group"
+}
