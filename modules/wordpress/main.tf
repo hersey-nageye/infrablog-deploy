@@ -1,18 +1,18 @@
 # Security group for the Wordpress application
 resource "aws_security_group" "wordpress_sg" {
   name        = var.sg_name
-  description = "Allow TLS inbound traffic and all outbound traffic"
+  description = var.wp_sg_description
   vpc_id      = var.vpc_id
 
   tags = {
-    Name = var.name
+    Name = var.name_tag
   }
 }
 
 # SSH inbound rule
 resource "aws_vpc_security_group_ingress_rule" "wordpress_ssh" {
   security_group_id            = aws_security_group.wordpress_sg.id
-  referenced_security_group_id = var.sg_id # Denotes Bastion sg it
+  referenced_security_group_id = var.sg_id # Denotes Bastion SG ID
   from_port                    = 22
   ip_protocol                  = "tcp"
   to_port                      = 22
@@ -81,7 +81,7 @@ resource "aws_instance" "wordpress_server" {
   key_name                    = aws_key_pair.ssh_access_key.id
 
   tags = {
-    Name : var.name
+    Name : var.name_tag
   }
   lifecycle {
     ignore_changes = [associate_public_ip_address, ami]

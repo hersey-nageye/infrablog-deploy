@@ -13,7 +13,7 @@ variable "sg_id" {
   description = "ID for the security group"
 }
 
-variable "sg_description" {
+variable "rds_sg_description" {
   type        = string
   description = "Security group description"
 }
@@ -28,7 +28,7 @@ variable "vpc_id" {
   description = "ID for the VPC"
 }
 
-variable "name" {
+variable "name_tag" {
   type        = string
   description = "Name for the resource tag"
 }

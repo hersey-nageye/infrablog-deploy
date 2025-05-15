@@ -3,12 +3,17 @@ variable "sg_name" {
   description = "Name for the security group"
 }
 
+variable "wp_sg_description" {
+  type        = string
+  description = "Description of the wordpress security group"
+}
+
 variable "vpc_id" {
   type        = string
   description = "ID for the VPC"
 }
 
-variable "name" {
+variable "name_tag" {
   type        = string
   description = "Name of resource tag"
 }
@@ -42,5 +47,5 @@ variable "subnet_id" {
 
 variable "sg_id" {
   type        = string
-  description = "Sg id for the bastion server security group"
+  description = "Security group ID for the bastion server security group"
 }

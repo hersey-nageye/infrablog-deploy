@@ -1,3 +1,0 @@
-locals {
-  name = "wordpress project"
-}
