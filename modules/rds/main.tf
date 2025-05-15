@@ -1,21 +1,21 @@
 # Security group for the RDS Instance
 resource "aws_security_group" "rds_sg" {
   name        = var.sg_name
-  description = var.sg_description
+  description = var.rds_sg_description
   vpc_id      = var.vpc_id
 
   tags = {
-    Name = var.name
+    Name = var.name_tag
   }
 }
 
 # Inbound rule to only allow traffic on port 3306 from Wordpress application
-resource "aws_vpc_security_group_ingress_rule" "wordpress_ssh" {
+resource "aws_vpc_security_group_ingress_rule" "rds_3306" {
   security_group_id            = aws_security_group.rds_sg.id
   referenced_security_group_id = var.sg_id
-  from_port                    = 22
+  from_port                    = 3306
   ip_protocol                  = "tcp"
-  to_port                      = 22
+  to_port                      = 3306
 }
 
 

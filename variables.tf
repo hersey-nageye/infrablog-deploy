@@ -53,3 +53,23 @@ variable "sg_name" {
   type        = string
   description = "Name of the Vault security group"
 }
+
+variable "wp_sg_description" {
+  type        = string
+  description = "Description of the wordpress security group"
+}
+
+variable "rds_sg_description" {
+  type        = string
+  description = "Description of the RDS security group"
+}
+
+variable "subnet_group_name" {
+  type        = string
+  description = "Name of the RDS subnet group"
+}
+
+variable "db_name" {
+  type        = string
+  description = "Database name"
+}
