@@ -1,11 +1,11 @@
 # Security group for the Bastion server
 resource "aws_security_group" "bastion_sg" {
   name        = var.sg_name
-  description = var.sg_description
+  description = var.bt_sg_description
   vpc_id      = var.vpc_id
 
   tags = {
-    Name = var.name
+    Name = var.name_tag
   }
 }
 
@@ -52,7 +52,7 @@ resource "aws_instance" "wordpress_server" {
   key_name                    = aws_key_pair.ssh_access_key.id
 
   tags = {
-    Name : var.name
+    Name : var.name_tag
   }
   lifecycle {
     ignore_changes = [associate_public_ip_address, ami]

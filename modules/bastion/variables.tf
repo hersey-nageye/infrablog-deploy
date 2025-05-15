@@ -8,17 +8,12 @@ variable "vpc_id" {
   description = "ID for the VPC"
 }
 
-variable "name" {
+variable "name_tag" {
   type        = string
   description = "Name for the resource tag"
 }
 
-variable "sg_id" {
-  type        = string
-  description = "ID for the security group"
-}
-
-variable "sg_description" {
+variable "bt_sg_description" {
   type        = string
   description = "Security group description"
 }
@@ -47,5 +42,5 @@ variable "ami_onwer_id" {
 
 variable "subnet_id" {
   type        = string
-  description = "ID for the subnet"
+  description = "ID for the public subnet"
 }

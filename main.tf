@@ -47,7 +47,25 @@ module "rds" {
   vpc_id             = module.vpc.vpc_id
   name_tag           = var.name_tag
 
+}
 
+module "bastion" {
+  source            = "./modules/bastion"
+  sg_name           = "bastion-sg"
+  bt_sg_description = var.bt_sg_description
+  vpc_id            = module.vpc.vpc_id
+  key_name          = var.key_name
+  public_key        = file(var.public_key_path)
+  ami_name_filter   = var.ami_name_filter
+  ami_onwer_id      = var.ami_onwer_id
+  subnet_id         = module.vpc.public_subnet_id
+  name_tag          = var.name_tag
+
+}
+
+module "route53" {
+  source      = "./modules/route53"
+  domain_name = var.domain_name
 }
 
 

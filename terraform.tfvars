@@ -13,6 +13,11 @@ subnet_group_name         = "rds-subnet-group"
 # Security groups
 wp_sg_description  = "Inbound: SSH (22) from bastion-server-sg, HTTP (80) and HTTPS (443) from 0.0.0.0/0. Outbound: All."
 rds_sg_description = "Inbound: MySQL traffic (3306) from wordpress-sg. Outbound: All."
+bt_sg_description  = "Inbound: SSH (22) from from 0.0.0.0/0. Outbound: All"
+
+# Domain and Routing
+domain_name = "drhersey.org"
+
 
 # Database
 db_name = "wordpress-db"
