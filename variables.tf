@@ -73,3 +73,13 @@ variable "db_name" {
   type        = string
   description = "Database name"
 }
+
+variable "bt_sg_description" {
+  type        = string
+  description = "Security group description"
+}
+
+variable "domain_name" {
+  type        = string
+  description = "Domain name of wordpress application"
+}
