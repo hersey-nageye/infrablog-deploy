@@ -1,31 +1,20 @@
-variable "sg_name" {
+variable "name" {
   type        = string
-  description = "Name of the security group"
+  description = "Name tag for resource"
+}
+
+variable "tags" {
+  type    = map(string)
+  default = {}
 }
 
 variable "vpc_id" {
   type        = string
   description = "ID for the VPC"
 }
-
-variable "name_tag" {
-  type        = string
-  description = "Name for the resource tag"
-}
-
 variable "bt_sg_description" {
   type        = string
   description = "Security group description"
-}
-
-variable "key_name" {
-  type        = string
-  description = "Name of the SSH key"
-}
-
-variable "public_key" {
-  type        = string
-  description = "File link to the public key"
 }
 
 variable "ami_name_filter" {
@@ -43,4 +32,9 @@ variable "ami_onwer_id" {
 variable "subnet_id" {
   type        = string
   description = "ID for the public subnet"
+}
+
+variable "ipv4_cidr" {
+  type        = string
+  description = "CIDR block for source IP address"
 }

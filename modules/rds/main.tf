@@ -1,12 +1,15 @@
 # Security group for the RDS Instance
 resource "aws_security_group" "rds_sg" {
-  name        = var.sg_name
+  name        = var.name
   description = var.rds_sg_description
   vpc_id      = var.vpc_id
 
-  tags = {
-    Name = var.name_tag
-  }
+  tags = merge(
+    {
+      Name = var.name
+    },
+    var.tags
+  )
 }
 
 # Inbound rule to only allow traffic on port 3306 from Wordpress application
@@ -20,8 +23,10 @@ resource "aws_vpc_security_group_ingress_rule" "rds_3306" {
 
 
 # To generate random username
-resource "random_pet" "db_username" {
-  length = 2
+resource "random_string" "db_username" {
+  length  = 8
+  upper   = false
+  special = false
 }
 
 # To generate random password
@@ -39,7 +44,7 @@ resource "aws_db_instance" "database" {
   engine               = "mysql"
   engine_version       = "8.0"
   instance_class       = "db.t3.micro"
-  username             = random_pet.db_username.id
+  username             = random_string.db_username.result
   password             = random_password.db_password.result
   skip_final_snapshot  = true
 }

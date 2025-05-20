@@ -18,17 +18,17 @@ variable "rds_sg_description" {
   description = "Security group description"
 }
 
-variable "sg_name" {
+variable "name" {
   type        = string
-  description = "Name of the security group"
+  description = "Name tag for the resource"
+}
+
+variable "tags" {
+  type    = map(string)
+  default = {}
 }
 
 variable "vpc_id" {
   type        = string
   description = "ID for the VPC"
-}
-
-variable "name_tag" {
-  type        = string
-  description = "Name for the resource tag"
 }

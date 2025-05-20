@@ -1,12 +1,15 @@
 # Security group for the Wordpress application
 resource "aws_security_group" "wordpress_sg" {
-  name        = var.sg_name
-  description = var.wp_sg_description
+  name        = var.name
+  description = "SG for ${var.name}"
   vpc_id      = var.vpc_id
 
-  tags = {
-    Name = var.name_tag
-  }
+  tags = merge(
+    {
+      Name = var.name
+    },
+    var.tags
+  )
 }
 
 # SSH inbound rule
@@ -47,10 +50,9 @@ resource "aws_eip" "wordpress_eip" {
   instance = aws_instance.wordpress_server.id
 }
 
-# Public key for accessing the Wordpress instance
-resource "aws_key_pair" "ssh_access_key" {
-  key_name   = var.key_name
-  public_key = var.public_key
+# Data block to read existing key pair
+data "aws_key_pair" "existing_key" {
+  key_name = "terraform"
 }
 
 # Data block to dynamically retrieve latest Ubuntu AMI for our instance
@@ -78,11 +80,14 @@ resource "aws_instance" "wordpress_server" {
   associate_public_ip_address = true
   subnet_id                   = var.subnet_id
   vpc_security_group_ids      = [aws_security_group.wordpress_sg.id]
-  key_name                    = aws_key_pair.ssh_access_key.id
+  key_name                    = data.aws_key_pair.existing_key.key_name
 
-  tags = {
-    Name : var.name_tag
-  }
+  tags = merge(
+    {
+      Name = var.name
+    },
+    var.tags
+  )
   lifecycle {
     ignore_changes = [associate_public_ip_address, ami]
   }

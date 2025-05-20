@@ -3,5 +3,5 @@ output "bastion_sg_id" {
 }
 
 output "wordpress_id" {
-  value = aws_instance.wordpress_server.id
+  value = [aws_instance.wordpress_server.id]
 }

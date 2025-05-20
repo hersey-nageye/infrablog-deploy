@@ -1,9 +1,12 @@
 # VPC
 resource "aws_vpc" "custom-vpc" {
   cidr_block = var.vpc_cidrs
-  tags = {
-    Name = "${var.name_tag}--vpc"
-  }
+  tags = merge(
+    {
+      Name = var.name
+    },
+    var.tags
+  )
 }
 
 # Public subnet (only one)
@@ -11,9 +14,12 @@ resource "aws_subnet" "public_subnet" {
   vpc_id                  = aws_vpc.custom-vpc.id
   cidr_block              = var.public_subnet_cidrs
   map_public_ip_on_launch = true
-  tags = {
-    Name : "${var.name_tag}--public subnet"
-  }
+  tags = merge(
+    {
+      Name = "${var.name}--public subnet"
+    },
+    var.tags
+  )
 }
 
 # Creating 2 private subnets to house RDS instances
@@ -22,14 +28,17 @@ resource "aws_subnet" "private_subnet" {
   vpc_id            = aws_vpc.custom-vpc.id
   cidr_block        = var.private_subnet_cidrs[count.index]
   availability_zone = var.subnet_availability_zones[count.index]
-  tags = {
-    Name : "${var.name_tag}--private subnet--${count.index + 1}"
-  }
+  tags = merge(
+    {
+      Name = "${var.name}--private subnet--${count.index + 1}"
+    },
+    var.tags
+  )
 }
 
 # To group together the two private subnets for RDS deployment
 resource "aws_db_subnet_group" "db_subnet_group" {
-  name        = "${var.name_tag}--db subnet group"
+  name        = var.subnet_group_name
   subnet_ids  = [aws_subnet.private_subnet[0].id, aws_subnet.private_subnet[1].id]
   description = var.subnet_group_description
 }
@@ -38,23 +47,29 @@ resource "aws_db_subnet_group" "db_subnet_group" {
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.custom-vpc.id
 
-  tags = {
-    Name = "${var.name_tag}--igw"
-  }
+  tags = merge(
+    {
+      Name = "${var.name}--igw"
+    },
+    var.tags
+  )
 }
 
 # To route local network traffic to the internet
 resource "aws_route_table" "public_route_table" {
   vpc_id = aws_vpc.custom-vpc.id
 
-  route = {
+  route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.igw.id
   }
 
-  tags = {
-    Name = "${var.name_tag}--public route table"
-  }
+  tags = merge(
+    {
+      Name = "${var.name}--public route table"
+    },
+    var.tags
+  )
 }
 
 # To associate a route table with our public subnet
@@ -72,9 +87,12 @@ resource "aws_eip" "nat_eip" {
 resource "aws_nat_gateway" "ngw" {
   allocation_id = aws_eip.nat_eip.id
   subnet_id     = aws_subnet.public_subnet.id
-  tags = {
-    Name : "${var.name_tag}--ngw"
-  }
+  tags = merge(
+    {
+      Name = "${var.name}--ngw"
+    },
+    var.tags
+  )
   depends_on = [aws_internet_gateway.igw]
 }
 
@@ -87,9 +105,12 @@ resource "aws_route_table" "private_route_table" {
     nat_gateway_id = aws_nat_gateway.ngw.id
   }
 
-  tags = {
-    Name = "${var.name_tag}--private route table"
-  }
+  tags = merge(
+    {
+      Name = "${var.name}--private route table"
+    },
+    var.tags
+  )
 }
 
 # To associate the private route table with the first of our private subnets

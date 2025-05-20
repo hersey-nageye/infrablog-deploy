@@ -23,16 +23,6 @@ variable "private_subnet_cidrs" {
   description = "CIDR blocks for the private subnets"
 }
 
-variable "name_tag" {
-  type        = string
-  description = "Name tag for the resource"
-}
-
-variable "key_name" {
-  type        = string
-  description = "SSH key name"
-}
-
 variable "public_key_path" {
   type        = string
   description = "Path to the public key file used for SSH access"
@@ -47,11 +37,6 @@ variable "ami_name_filter" {
 variable "ami_onwer_id" {
   type        = string
   description = "Owner ID of the Ubuntu AMI"
-}
-
-variable "sg_name" {
-  type        = string
-  description = "Name of the Vault security group"
 }
 
 variable "wp_sg_description" {
@@ -82,4 +67,9 @@ variable "bt_sg_description" {
 variable "domain_name" {
   type        = string
   description = "Domain name of wordpress application"
+}
+
+variable "ipv4_cidr" {
+  type        = string
+  description = "CIDR block for source IP address"
 }
