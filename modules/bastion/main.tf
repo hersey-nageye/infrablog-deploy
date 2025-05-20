@@ -1,27 +1,29 @@
 # Security group for the Bastion server
 resource "aws_security_group" "bastion_sg" {
-  name        = var.sg_name
-  description = var.bt_sg_description
+  name        = var.name
+  description = "SG for ${var.name}"
   vpc_id      = var.vpc_id
 
-  tags = {
-    Name = var.name_tag
-  }
+  tags = merge(
+    {
+      Name = var.name
+    },
+    var.tags
+  )
 }
 
 # SSH inbound rule
 resource "aws_vpc_security_group_ingress_rule" "bastion_ssh" {
   security_group_id = aws_security_group.bastion_sg.id
-  cidr_ipv4         = "172.28.215.169"
+  cidr_ipv4         = var.ipv4_cidr
   from_port         = 22
   ip_protocol       = "tcp"
   to_port           = 22
 }
 
-# Public key for accessing the Bastion instance
-resource "aws_key_pair" "ssh_access_key" {
-  key_name   = var.key_name
-  public_key = var.public_key
+# Data block to read existing key pair
+data "aws_key_pair" "existing_key" {
+  key_name = "terraform"
 }
 
 # Data block to dynamically retrieve latest Ubuntu AMI for our instance
@@ -48,12 +50,15 @@ resource "aws_instance" "wordpress_server" {
   instance_type               = "t2.micro"
   associate_public_ip_address = true
   subnet_id                   = var.subnet_id
-  vpc_security_group_ids      = [aws_security_group.wordpress_sg.id]
-  key_name                    = aws_key_pair.ssh_access_key.id
+  vpc_security_group_ids      = [aws_security_group.bastion_sg.id]
+  key_name                    = data.aws_key_pair.existing_key.key_name
 
-  tags = {
-    Name : var.name_tag
-  }
+  tags = merge(
+    {
+      Name = var.name
+    },
+    var.tags
+  )
   lifecycle {
     ignore_changes = [associate_public_ip_address, ami]
   }

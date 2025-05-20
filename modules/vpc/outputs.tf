@@ -10,7 +10,7 @@ output "public_subnet_id" {
 
 output "private_subnet_ids" {
   description = "The IDs for the private subnets"
-  value       = [for subnet in aws_aws_subnet.private_subnet : subnet.id]
+  value       = [for subnet in aws_subnet.private_subnet : subnet.id]
 }
 
 output "aws_db_subnet_group_id" {
@@ -21,11 +21,6 @@ output "aws_db_subnet_group_id" {
 output "igw_id" {
   description = "ID for the internet gateway"
   value       = aws_internet_gateway.igw.id
-}
-
-output "rt_id" {
-  description = "ID for the route table"
-  value       = aws_route_table.rt.id
 }
 
 output "eip_id" {
@@ -43,3 +38,6 @@ output "private_rt_id" {
   value       = aws_route_table.private_route_table.id
 }
 
+output "subnet_group_name" {
+  value = aws_db_subnet_group.db_subnet_group.name
+}

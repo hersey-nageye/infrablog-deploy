@@ -1,6 +1,11 @@
-variable "sg_name" {
+variable "name" {
   type        = string
-  description = "Name of the security group"
+  description = "Name tag of resource"
+}
+
+variable "tags" {
+  type    = map(string)
+  default = {}
 }
 
 variable "vpc_id" {
@@ -8,24 +13,9 @@ variable "vpc_id" {
   description = "ID for the VPC"
 }
 
-variable "name_tag" {
-  type        = string
-  description = "Name tag for the resource"
-}
-
 variable "subnet_id" {
   type        = string
   description = "ID for the subnet"
-}
-
-variable "key_name" {
-  type        = string
-  description = "SSH key name"
-}
-
-variable "public_key" {
-  type        = string
-  description = "File link to the public key"
 }
 
 variable "ami_name_filter" {
@@ -41,4 +31,9 @@ variable "ami_onwer_id" {
 variable "sg_id" {
   type        = string
   description = "SG ID for the Bastion server"
+}
+
+variable "ipv4_cidr" {
+  type        = string
+  description = "CIDR block for source IP address"
 }

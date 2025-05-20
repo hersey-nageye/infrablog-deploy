@@ -1,6 +1,11 @@
-variable "sg_name" {
+variable "name" {
   type        = string
-  description = "Name for the security group"
+  description = "Name tag for resource"
+}
+
+variable "tags" {
+  type    = map(string)
+  default = {}
 }
 
 variable "wp_sg_description" {
@@ -11,21 +16,6 @@ variable "wp_sg_description" {
 variable "vpc_id" {
   type        = string
   description = "ID for the VPC"
-}
-
-variable "name_tag" {
-  type        = string
-  description = "Name of resource tag"
-}
-
-variable "key_name" {
-  type        = string
-  description = "SSH key name"
-}
-
-variable "public_key" {
-  type        = string
-  description = "Link to the public key file"
 }
 
 variable "ami_name_filter" {

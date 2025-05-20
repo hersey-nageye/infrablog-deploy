@@ -19,12 +19,22 @@ variable "subnet_availability_zones" {
   description = "The availability zones for the subnets"
 }
 
-variable "name_tag" {
+variable "name" {
   type        = string
   description = "Name tag used for the resource"
+}
+
+variable "tags" {
+  type    = map(string)
+  default = {}
 }
 
 variable "subnet_group_description" {
   type        = string
   description = "description of the subnet group"
+}
+
+variable "subnet_group_name" {
+  type        = string
+  description = "Name of the subnet group"
 }
