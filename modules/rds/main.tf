@@ -44,7 +44,7 @@ resource "aws_db_instance" "database" {
   engine               = "mysql"
   engine_version       = "8.0"
   instance_class       = "db.t3.micro"
-  username             = random_string.db_username.result
+  username             = "dbuser_${random_string.db_username.result}"
   password             = random_password.db_password.result
   skip_final_snapshot  = true
 }
