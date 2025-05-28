@@ -5,3 +5,7 @@ output "rds_sg_id" {
 output "db_username" {
   value = random_string.db_username.result
 }
+
+output "db_password" {
+  value = random_password.db_password.result
+}
