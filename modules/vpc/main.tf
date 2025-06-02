@@ -1,63 +1,80 @@
-# VPC
-resource "aws_vpc" "custom-vpc" {
-  cidr_block = var.vpc_cidrs
+# Create the main VPC
+resource "aws_vpc" "custom_vpc" {
+  cidr_block = var.vpc_cidr
   tags = merge(
+    var.common_tags,
     {
-      Name = var.name
-    },
-    var.tags
+      Name = "${var.project_name}-vpc-${var.environment}"
+    }
   )
 }
 
-# Public subnet (only one)
+# One public subnet
 resource "aws_subnet" "public_subnet" {
-  vpc_id                  = aws_vpc.custom-vpc.id
-  cidr_block              = var.public_subnet_cidrs
+  vpc_id                  = aws_vpc.custom_vpc.id
+  cidr_block              = var.public_subnet_cidrs[0]
+  availability_zone       = var.subnet_availability_zones[0]
   map_public_ip_on_launch = true
   tags = merge(
+    var.common_tags,
     {
-      Name = "${var.name}--public subnet"
-    },
-    var.tags
+      Name = "${var.project_name}-public-subnet-${var.environment}-a"
+    }
   )
 }
 
-# Creating 2 private subnets to house RDS instances
-resource "aws_subnet" "private_subnet" {
-  count             = 2
-  vpc_id            = aws_vpc.custom-vpc.id
-  cidr_block        = var.private_subnet_cidrs[count.index]
-  availability_zone = var.subnet_availability_zones[count.index]
+# Two private subnets (for RDS)
+resource "aws_subnet" "private_subnet_a" {
+  vpc_id            = aws_vpc.custom_vpc.id
+  cidr_block        = var.private_subnet_cidrs[0]
+  availability_zone = var.subnet_availability_zones[0]
   tags = merge(
+    var.common_tags,
     {
-      Name = "${var.name}--private subnet--${count.index + 1}"
-    },
-    var.tags
+      Name = "${var.project_name}-private-subnet-${var.environment}-a"
+    }
   )
 }
 
-# To group together the two private subnets for RDS deployment
+resource "aws_subnet" "private_subnet_b" {
+  vpc_id            = aws_vpc.custom_vpc.id
+  cidr_block        = var.private_subnet_cidrs[1]
+  availability_zone = var.subnet_availability_zones[1]
+  tags = merge(
+    var.common_tags,
+    {
+      Name = "${var.project_name}-private-subnet-${var.environment}-b"
+    }
+  )
+}
+
+# Group private subnets for RDS deployment
 resource "aws_db_subnet_group" "db_subnet_group" {
-  name        = var.subnet_group_name
-  subnet_ids  = [aws_subnet.private_subnet[0].id, aws_subnet.private_subnet[1].id]
+  name        = "${var.subnet_group_name}-${var.environment}"
+  subnet_ids  = [aws_subnet.private_subnet_a.id, aws_subnet.private_subnet_b.id]
   description = var.subnet_group_description
-}
-
-# To allow the local network to communicate with the internet
-resource "aws_internet_gateway" "igw" {
-  vpc_id = aws_vpc.custom-vpc.id
-
   tags = merge(
+    var.common_tags,
     {
-      Name = "${var.name}--igw"
-    },
-    var.tags
+      Name = "${var.project_name}-db-subnet-group-${var.environment}"
+    }
   )
 }
 
-# To route local network traffic to the internet
-resource "aws_route_table" "public_route_table" {
-  vpc_id = aws_vpc.custom-vpc.id
+# Internet Gateway
+resource "aws_internet_gateway" "igw" {
+  vpc_id = aws_vpc.custom_vpc.id
+  tags = merge(
+    var.common_tags,
+    {
+      Name = "${var.project_name}-igw-${var.environment}"
+    }
+  )
+}
+
+# Public route table
+resource "aws_route_table" "public_rt" {
+  vpc_id = aws_vpc.custom_vpc.id
 
   route {
     cidr_block = "0.0.0.0/0"
@@ -65,66 +82,40 @@ resource "aws_route_table" "public_route_table" {
   }
 
   tags = merge(
+    var.common_tags,
     {
-      Name = "${var.name}--public route table"
-    },
-    var.tags
+      Name = "${var.project_name}-public-route-table-${var.environment}"
+    }
   )
 }
 
-# To associate a route table with our public subnet
-resource "aws_route_table_association" "public_route_table_association" {
+# Associate public subnet with public route table
+resource "aws_route_table_association" "public_rta" {
   subnet_id      = aws_subnet.public_subnet.id
-  route_table_id = aws_route_table.public_route_table.id
+  route_table_id = aws_route_table.public_rt.id
 }
 
-# For our NAT Gateway. This is to ensure a static, public IPv4 address for outbound connectivity
-resource "aws_eip" "nat_eip" {
-  domain = "vpc"
-}
+# Private route table (shared for both private subnets, no NAT)
+resource "aws_route_table" "private_rt" {
+  vpc_id = aws_vpc.custom_vpc.id
 
-# To connect instance in a private subnet to the internet
-resource "aws_nat_gateway" "ngw" {
-  allocation_id = aws_eip.nat_eip.id
-  subnet_id     = aws_subnet.public_subnet.id
-  tags = merge(
-    {
-      Name = "${var.name}--ngw"
-    },
-    var.tags
-  )
-  depends_on = [aws_internet_gateway.igw]
-}
-
-# To route traffic from the private subnet to the internet
-resource "aws_route_table" "private_route_table" {
-  vpc_id = aws_vpc.custom-vpc.id
-
-  route {
-    cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.ngw.id
-  }
+  # Optional: add local routes if needed; no NAT for dev
 
   tags = merge(
+    var.common_tags,
     {
-      Name = "${var.name}--private route table"
-    },
-    var.tags
+      Name = "${var.project_name}-private-route-table-${var.environment}"
+    }
   )
 }
 
-# To associate the private route table with the first of our private subnets
-resource "aws_route_table_association" "private_route_table_association_1" {
-  subnet_id      = aws_subnet.private_subnet[0].id
-  route_table_id = aws_route_table.private_route_table.id
+# Associate private subnets with private route table
+resource "aws_route_table_association" "private_rta_a" {
+  subnet_id      = aws_subnet.private_subnet_a.id
+  route_table_id = aws_route_table.private_rt.id
 }
 
-# To associate the private route table with the second of our private subnets
-resource "aws_route_table_association" "private_route_table_association_2" {
-  subnet_id      = aws_subnet.private_subnet[1].id
-  route_table_id = aws_route_table.private_route_table.id
+resource "aws_route_table_association" "private_rta_b" {
+  subnet_id      = aws_subnet.private_subnet_b.id
+  route_table_id = aws_route_table.private_rt.id
 }
-
-
-
-
