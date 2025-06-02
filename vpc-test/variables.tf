@@ -1,7 +1,6 @@
 variable "vpc_cidr" {
   type        = string
   description = "Cidr blocks for the VPC"
-
 }
 
 variable "public_subnet_cidrs" {
@@ -9,20 +8,38 @@ variable "public_subnet_cidrs" {
   description = "CIDR blocks for the public subnets"
 }
 
-variable "subnet_availability_zones" {
-  type        = list(string)
-  description = "List of availability zones for all subnets"
+variable "public_subnet_count" {
+  type        = number
+  description = "Number of public subnets to create"
 }
 
+variable "private_subnet_count" {
+  type        = number
+  description = "Number of private subnets to create"
+  default     = 2
+
+}
+variable "public_subnet_azs" {
+  type        = list(string)
+  description = "The availability zones for the public subnets"
+  default     = []
+}
 
 variable "private_subnet_cidrs" {
   type        = list(string)
   description = "Cidr blocks for the private subnets"
+  default     = ["10.0.2.0/24", "10.0.3.0/24"]
 }
 
-variable "name" {
-  type        = string
-  description = "Name tag used for identifying the resource in AWS"
+variable "private_subnet_azs" {
+  type        = list(string)
+  description = "The availability zones for the subnets"
+  default     = []
+}
+
+variable "tags" {
+  type    = map(string)
+  default = {}
 }
 
 variable "subnet_group_description" {
@@ -37,7 +54,7 @@ variable "subnet_group_name" {
 
 variable "environment" {
   type        = string
-  description = "The environment for which the resources are being created, e.g., dev, staging, prod"
+  description = "The environment for which the resources are being created, e.g., dev, prod"
 }
 
 variable "project_name" {
@@ -48,4 +65,10 @@ variable "project_name" {
 variable "common_tags" {
   type        = map(string)
   description = "Common tags to be applied to all resources"
+}
+
+variable "env" {
+  description = "Deployment environment"
+  type        = string
+  default     = "localstack"
 }
