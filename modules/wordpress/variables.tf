@@ -7,12 +7,6 @@ variable "tags" {
   type    = map(string)
   default = {}
 }
-
-variable "wp_sg_description" {
-  type        = string
-  description = "Description of the wordpress security group"
-}
-
 variable "vpc_id" {
   type        = string
   description = "ID for the VPC"
@@ -38,4 +32,38 @@ variable "subnet_id" {
 variable "sg_id" {
   type        = string
   description = "Security group ID for the bastion server security group"
+}
+
+variable "common_tags" {
+  type        = map(string)
+  description = "Common tags to be applied to all resources"
+
+}
+
+variable "environment" {
+  type        = string
+  description = "Environment for the resources (e.g., dev, prod)"
+}
+
+variable "project_name" {
+  type        = string
+  description = "Project name for the resources"
+
+}
+
+variable "ipv4_cidr" {
+  type        = string
+  description = "IPv4 CIDR for my IP address"
+}
+
+variable "instance_type" {
+  type        = string
+  description = "Instance type for the EC2 instance"
+
+}
+
+variable "vault_private_ip" {
+  type        = string
+  description = "Private IP address for the Vault server"
+
 }
