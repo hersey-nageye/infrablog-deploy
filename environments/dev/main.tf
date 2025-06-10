@@ -4,7 +4,6 @@ module "vpc" {
   public_subnet_cidrs       = var.public_subnet_cidrs
   subnet_availability_zones = var.subnet_availability_zones
   private_subnet_cidrs      = var.private_subnet_cidrs
-  name                      = var.name
   subnet_group_description  = var.subnet_group_description
   subnet_group_name         = var.subnet_group_name
   environment               = var.environment
@@ -13,56 +12,53 @@ module "vpc" {
 
 }
 
-# module "vault" {
-#   source          = "./modules/vault"
-#   name            = "vault"
-#   tags            = local.common_tags
-#   vpc_id          = module.vpc.vpc_id
-#   subnet_id       = module.vpc.private_subnet_ids[0]
-#   ami_name_filter = var.ami_name_filter
-#   ami_onwer_id    = var.ami_onwer_id
-#   sg_id           = module.bastion.bastion_sg_id
-#   ipv4_cidr       = var.ipv4_cidr
-# }
+module "bastion" {
+  source              = "../../modules/bastion"
+  name                = var.bastion_name
+  vpc_id              = module.vpc.vpc_id
+  ami_name_filter     = var.ami_name_filter
+  ami_onwer_id        = var.ami_onwer_id
+  subnet_id           = module.vpc.public_subnet_id
+  ipv4_cidr           = var.ipv4_cidr
+  instance_type       = var.instance_type
+  associate_public_ip = var.associate_public_ip
+  key_name            = var.key_name
+  environment         = var.environment
+  project_name        = var.project_name
+  common_tags         = var.common_tags
 
-# module "wordpress_app" {
-#   source            = "./modules/wordpress"
-#   name              = "wordpress"
-#   wp_sg_description = var.wp_sg_description
-#   vpc_id            = module.vpc.vpc_id
-#   ami_name_filter   = var.ami_name_filter
-#   ami_onwer_id      = var.ami_onwer_id
-#   subnet_id         = module.vpc.private_subnet_ids[1]
-#   sg_id             = module.bastion.bastion_sg_id
-# }
+}
 
-# module "rds" {
-#   source             = "./modules/rds"
-#   name               = "rds"
-#   tags               = local.common_tags
-#   rds_sg_description = var.rds_sg_description
-#   sg_id              = module.wordpress_app.wordpress_sg_id
-#   subnet_group_name  = module.vpc.subnet_group_name
-#   db_name            = var.db_name
-#   vpc_id             = module.vpc.vpc_id
-# }
+module "vault" {
+  source          = "../../modules/vault"
+  vpc_id          = module.vpc.vpc_id
+  subnet_id       = module.vpc.public_subnet_id
+  name            = var.vault_name
+  ami_name_filter = var.ami_name_filter
+  ami_onwer_id    = var.ami_onwer_id
+  instance_type   = var.instance_type
+  key_name        = var.key_name
+  ipv4_cidr       = var.ipv4_cidr
+  environment     = var.environment
+  project_name    = var.project_name
+  common_tags     = var.common_tags
+  sg_id           = module.bastion.bastion_sg_id
+  wordpress_sg_id = module.wordpress.wordpress_sg_id
+}
 
-# module "bastion" {
-#   source            = "./modules/bastion"
-#   name              = "bastion"
-#   tags              = local.common_tags
-#   bt_sg_description = var.bt_sg_description
-#   vpc_id            = module.vpc.vpc_id
-#   ami_name_filter   = var.ami_name_filter
-#   ami_onwer_id      = var.ami_onwer_id
-#   subnet_id         = module.vpc.public_subnet_id
-#   ipv4_cidr         = var.ipv4_cidr
-
-# }
-
-# module "route53" {
-#   source      = "./modules/route53"
-#   domain_name = var.domain_name
-# }
-
+module "wordpress" {
+  source           = "../../modules/wordpress"
+  vpc_id           = module.vpc.vpc_id
+  subnet_id        = module.vpc.public_subnet_id
+  ami_name_filter  = var.ami_name_filter
+  ami_onwer_id     = var.ami_onwer_id
+  instance_type    = var.instance_type
+  ipv4_cidr        = var.ipv4_cidr
+  environment      = var.environment
+  project_name     = var.project_name
+  common_tags      = var.common_tags
+  sg_id            = module.bastion.bastion_sg_id
+  name             = var.wp_name
+  vault_private_ip = module.vault.vault_private_ip
+}
 

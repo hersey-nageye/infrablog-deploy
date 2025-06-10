@@ -18,10 +18,10 @@ variable "private_subnet_cidrs" {
   description = "Cidr blocks for the private subnets"
 }
 
-variable "name" {
-  type        = string
-  description = "Name tag used for identifying the resource in AWS"
-}
+# variable "name" {
+#   type        = string
+#   description = "Name tag used for identifying the resource in AWS"
+# }
 
 # variable "tags" {
 #   type    = map(string)

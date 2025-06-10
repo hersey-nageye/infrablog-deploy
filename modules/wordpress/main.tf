@@ -5,38 +5,56 @@ resource "aws_security_group" "wordpress_sg" {
   vpc_id      = var.vpc_id
 
   tags = merge(
+    var.common_tags,
     {
-      Name = var.name
-    },
-    var.tags
+      Name = "${var.project_name}-wordpress-sg-${var.environment}"
+    }
   )
 }
 
 # SSH inbound rule
 resource "aws_vpc_security_group_ingress_rule" "wordpress_ssh" {
-  security_group_id            = aws_security_group.wordpress_sg.id
-  referenced_security_group_id = var.sg_id # Denotes Bastion SG ID
-  from_port                    = 22
-  ip_protocol                  = "tcp"
-  to_port                      = 22
+  security_group_id = aws_security_group.wordpress_sg.id
+  cidr_ipv4         = var.ipv4_cidr # This is your IP address. Change this once the Wordpress app is correctly configured to the security group for the bastion host
+  from_port         = 22
+  ip_protocol       = "tcp"
+  to_port           = 22
+  tags = merge(
+    var.common_tags,
+    {
+      Name = "${var.project_name}-wordpress-ssh-rule-${var.environment}"
+    }
+  )
 }
 
 # Inbound rule for HTTP access
 resource "aws_vpc_security_group_ingress_rule" "wordpress_http" {
   security_group_id = aws_security_group.wordpress_sg.id
-  cidr_ipv4         = "0.0.0.0/0" # Make this temporary and close once you've configured redirection to HTTPS
+  cidr_ipv4         = var.ipv4_cidr
   from_port         = 80
   ip_protocol       = "tcp"
   to_port           = 80
+  tags = merge(
+    var.common_tags,
+    {
+      Name = "${var.project_name}-wordpress-http-rule-${var.environment}"
+    }
+  )
 }
 
 # Inbound rule for HTTPS access
 resource "aws_vpc_security_group_ingress_rule" "wordpress_https" {
   security_group_id = aws_security_group.wordpress_sg.id
-  cidr_ipv4         = "0.0.0.0/0"
+  cidr_ipv4         = var.ipv4_cidr
   from_port         = 443
   ip_protocol       = "tcp"
   to_port           = 443
+  tags = merge(
+    var.common_tags,
+    {
+      Name = "${var.project_name}-wordpress-https-rule-${var.environment}"
+    }
+  )
 }
 
 # Outbound rule for all traffic on all ports
@@ -44,11 +62,18 @@ resource "aws_vpc_security_group_egress_rule" "allow_all_traffic_ipv4" {
   security_group_id = aws_security_group.wordpress_sg.id
   cidr_ipv4         = "0.0.0.0/0"
   ip_protocol       = "-1" # semantically equivalent to all ports
+  tags = merge(
+    var.common_tags,
+    {
+      Name = "${var.project_name}-wordpress-egress-rule-${var.environment}"
+    }
+  )
 }
 
-resource "aws_eip" "wordpress_eip" {
-  instance = aws_instance.wordpress_server.id
-}
+# Static IP address for the Wordpress application
+# resource "aws_eip" "wordpress_eip" {
+#   instance = aws_instance.wordpress_server.id
+# }
 
 # Data block to read existing key pair
 data "aws_key_pair" "existing_key" {
@@ -76,17 +101,19 @@ data "aws_ami" "ubuntu" {
 # EC2 instance Wordpress application will run on
 resource "aws_instance" "wordpress_server" {
   ami                         = data.aws_ami.ubuntu.id
-  instance_type               = "t2.micro"
+  instance_type               = var.instance_type
   associate_public_ip_address = true
   subnet_id                   = var.subnet_id
   vpc_security_group_ids      = [aws_security_group.wordpress_sg.id]
   key_name                    = data.aws_key_pair.existing_key.key_name
+  user_data                   = file("${path.module}/scripts/wordpress-bootstrap.sh")
+  user_data_replace_on_change = true
 
   tags = merge(
+    var.common_tags,
     {
-      Name = var.name
-    },
-    var.tags
+      Name = "${var.project_name}-wordpress-server-${var.environment}"
+    }
   )
   lifecycle {
     ignore_changes = [associate_public_ip_address, ami]

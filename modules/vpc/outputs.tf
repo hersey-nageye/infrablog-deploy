@@ -3,7 +3,7 @@ output "vpc_id" {
   value       = aws_vpc.custom_vpc.id
 }
 
-output "public_subnet_ids" {
+output "public_subnet_id" {
   description = "The ID for the public subnet"
   value       = aws_subnet.public_subnet.id
 }
