@@ -23,7 +23,7 @@ common_tags = {
 
 # # Security groups
 # wp_sg_description  = "Inbound: SSH (22) from bastion-server-sg, HTTP (80) and HTTPS (443) from 0.0.0.0/0. Outbound: All."
-# rds_sg_description = "Inbound: MySQL traffic (3306) from wordpress-sg. Outbound: All."
+rds_sg_description = "Inbound: MySQL traffic (3306) from wordpress-sg. Outbound: All."
 # bt_sg_description = "Inbound: SSH (22) from from 0.0.0.0/0. Outbound: All"
 bastion_name = "bastion"   # Name tag used for identifying the resource in AWS
 vault_name   = "vault"     # Name tag used for identifying the resource in AWS
@@ -36,3 +36,7 @@ ami_onwer_id        = "099720109477"
 instance_type       = "t2.micro"
 associate_public_ip = true
 key_name            = "terraform"
+
+# RDS
+db_name     = "wordpressdb"
+rds_sg_name = "wordpress-rds-sg"

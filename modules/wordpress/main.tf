@@ -106,7 +106,10 @@ resource "aws_instance" "wordpress_server" {
   subnet_id                   = var.subnet_id
   vpc_security_group_ids      = [aws_security_group.wordpress_sg.id]
   key_name                    = data.aws_key_pair.existing_key.key_name
-  user_data                   = file("${path.module}/scripts/wordpress-bootstrap.sh")
+  user_data = templatefile("${path.module}/scripts/wordpress-user-data.sh.tpl", {
+    vault_ip = var.vault_private_ip
+  })
+
   user_data_replace_on_change = true
 
   tags = merge(

@@ -65,8 +65,8 @@ variable "key_name" {
   description = "Name of the existing key pair to use for SSH access"
 }
 
-variable "wordpress_sg_id" {
+variable "rds_endpoint" {
   type        = string
-  description = "Security group ID for the Wordpress application"
+  description = "Endpoint for the RDS instance"
 
 }
