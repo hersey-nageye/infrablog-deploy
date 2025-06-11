@@ -9,3 +9,9 @@ output "db_username" {
 output "db_password" {
   value = random_password.db_password.result
 }
+
+output "rds_enpoint" {
+  description = "RDS endpoint for the database"
+  value       = aws_db_instance.database.address
+
+}

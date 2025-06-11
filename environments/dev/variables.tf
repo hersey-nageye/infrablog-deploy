@@ -96,3 +96,20 @@ variable "wp_name" {
   description = "Name tag used for identifying the Wordpress resource in AWS"
 
 }
+
+variable "db_name" {
+  type        = string
+  description = "Name of the database for the Wordpress application"
+  default     = "wordpressdb"
+}
+
+variable "rds_sg_name" {
+  type        = string
+  description = "Name of the security group for the RDS instance"
+}
+
+variable "rds_sg_description" {
+  type        = string
+  description = "Description of the security group for the RDS instance"
+
+}

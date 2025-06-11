@@ -38,12 +38,12 @@ module "vault" {
   ami_onwer_id    = var.ami_onwer_id
   instance_type   = var.instance_type
   key_name        = var.key_name
-  ipv4_cidr       = var.ipv4_cidr
+  ipv4_cidr       = module.vpc.vpc_id
   environment     = var.environment
   project_name    = var.project_name
   common_tags     = var.common_tags
   sg_id           = module.bastion.bastion_sg_id
-  wordpress_sg_id = module.wordpress.wordpress_sg_id
+  rds_endpoint    = module.rds.rds_endpoint
 }
 
 module "wordpress" {
@@ -60,5 +60,20 @@ module "wordpress" {
   sg_id            = module.bastion.bastion_sg_id
   name             = var.wp_name
   vault_private_ip = module.vault.vault_private_ip
+  depends_on       = [module.vault]
+}
+
+module "rds" {
+  source             = "../../modules/rds"
+  vpc_id             = module.vpc.vpc_id
+  subnet_group_name  = module.vpc.subnet_group_name
+  db_name            = var.db_name
+  rds_sg_description = var.rds_sg_description
+  name               = var.rds_sg_name
+  environment        = var.environment
+  project_name       = var.project_name
+  common_tags        = var.common_tags
+  wordpress_sg_id    = module.wordpress.wordpress_sg_id
+
 }
 

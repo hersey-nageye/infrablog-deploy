@@ -5,20 +5,26 @@ resource "aws_security_group" "rds_sg" {
   vpc_id      = var.vpc_id
 
   tags = merge(
+    var.common_tags,
     {
-      Name = var.name
-    },
-    var.tags
+      Name = "${var.project_name}-rds-sg-${var.environment}"
+    }
   )
 }
 
 # Inbound rule to only allow traffic on port 3306 from Wordpress application
 resource "aws_vpc_security_group_ingress_rule" "rds_3306" {
   security_group_id            = aws_security_group.rds_sg.id
-  referenced_security_group_id = var.sg_id
+  referenced_security_group_id = var.wordpress_sg_id # This is the security group ID of the Wordpress application
   from_port                    = 3306
   ip_protocol                  = "tcp"
   to_port                      = 3306
+  tags = merge(
+    var.common_tags,
+    {
+      Name = "${var.project_name}-rds-3306-rule-${var.environment}"
+    }
+  )
 }
 
 
@@ -47,6 +53,12 @@ resource "aws_db_instance" "database" {
   username             = "dbuser_${random_string.db_username.result}"
   password             = random_password.db_password.result
   skip_final_snapshot  = true
+  tags = merge(
+    var.common_tags,
+    {
+      Name = "${var.project_name}-rds-${var.environment}"
+    }
+  )
 }
 
 

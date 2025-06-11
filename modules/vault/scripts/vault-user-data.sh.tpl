@@ -61,7 +61,7 @@ systemctl start vault
 sleep 5
 
 # Initialize & unseal Vault if needed
-export VAULT_ADDR="http://127.0.1:8200"
+export VAULT_ADDR="http://127.0.0.1:8200"
 
 if ! vault status | grep -q "Initialized.*true"; then
   vault operator init -key-shares=1 -key-threshold=1 -format=json > /root/init.json
@@ -72,6 +72,6 @@ if ! vault status | grep -q "Initialized.*true"; then
   export VAULT_TOKEN="$ROOT_TOKEN"
 
   # Load sample secrets (for WordPress)
-  vault kv put secret/wordpress DB_USER=wp_user DB_PASS=wp_pass
+  vault kv put secret/wordpress DB_USER=wp_user DB_PASS=wp_pass DB_HOST="${rds_endpoint}"
   vault kv put secret/rds DB_USER=rds_user DB_PASS=rds_pass
 fi
