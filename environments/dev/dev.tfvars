@@ -12,7 +12,7 @@ subnet_availability_zones = ["eu-west-2a", "eu-west-2b"]
 
 subnet_group_description = "Subnet group for dev environment"
 subnet_group_name        = "dev-subnet-group"
-ipv4_cidr                = "0.0.0.0/0" # Source IP address for inbound SSH access to the bastion server
+ipv4_cidr                = "143.58.22.97/32" # Source IP address for inbound SSH access to the bastion server
 
 common_tags = {
   Environment = "dev"

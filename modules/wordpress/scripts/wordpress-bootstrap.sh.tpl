@@ -11,7 +11,7 @@ systemctl start apache2
 
 # Optional: Install Vault CLI
 VAULT_VERSION="1.15.5"
-VAULT_URL="https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_amd64.zip"
+VAULT_URL="https://releases.hashicorp.com/vault/$\{VAULT_VERSION}/vault_$\{VAULT_VERSION}_linux_amd64.zip"
 curl -fsSL "$VAULT_URL" -o /tmp/vault.zip
 unzip -q /tmp/vault.zip -d /usr/local/bin
 chmod +x /usr/local/bin/vault
@@ -44,9 +44,9 @@ rm -rf wordpress latest.tar.gz
 cat > wp-config.php <<EOF
 <?php
 define('DB_NAME', 'wordpressdb');
-define('DB_USER', '${DB_USER}');
-define('DB_PASSWORD', '${DB_PASS}');
-define('DB_HOST', '${DB_HOST}');
+define('DB_USER', '$\{DB_USER}');
+define('DB_PASSWORD', '$\{DB_PASS}');
+define('DB_HOST', '$\{DB_HOST}');
 define('DB_CHARSET', 'utf8');
 define('DB_COLLATE', '');
 \$table_prefix = 'wp_';

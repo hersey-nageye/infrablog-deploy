@@ -29,11 +29,11 @@ resource "aws_vpc_security_group_ingress_rule" "vault_ssh" {
 
 # Inbound rule for Vault UI access
 resource "aws_vpc_security_group_ingress_rule" "vault_UI" {
-  security_group_id            = aws_security_group.vault_sg.id
-  referenced_security_group_id = var.vpc_id # This is the security group ID of the VPC, allowing access from within the VPC
-  from_port                    = 8200
-  ip_protocol                  = "tcp"
-  to_port                      = 8200
+  security_group_id = aws_security_group.vault_sg.id
+  cidr_ipv4         = var.ipv4_cidr
+  from_port         = 8200
+  ip_protocol       = "tcp"
+  to_port           = 8200
   tags = merge(
     var.common_tags,
     {

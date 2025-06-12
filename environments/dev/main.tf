@@ -38,12 +38,12 @@ module "vault" {
   ami_onwer_id    = var.ami_onwer_id
   instance_type   = var.instance_type
   key_name        = var.key_name
-  ipv4_cidr       = module.vpc.vpc_id
+  ipv4_cidr       = var.ipv4_cidr
   environment     = var.environment
   project_name    = var.project_name
   common_tags     = var.common_tags
   sg_id           = module.bastion.bastion_sg_id
-  rds_endpoint    = module.rds.rds_endpoint
+  rds_endpoint    = "0.0.0.0"
 }
 
 module "wordpress" {
@@ -59,7 +59,7 @@ module "wordpress" {
   common_tags      = var.common_tags
   sg_id            = module.bastion.bastion_sg_id
   name             = var.wp_name
-  vault_private_ip = module.vault.vault_private_ip
+  vault_private_ip = "0.0.0.0"
   depends_on       = [module.vault]
 }
 
