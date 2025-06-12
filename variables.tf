@@ -34,6 +34,13 @@ variable "project_name" {
 
 }
 
+variable "db_name" {
+  description = "Name of the RDS database"
+  type        = string
+
+}
+
+
 
 
 

@@ -1,0 +1,204 @@
+# ---- MODULE: VPC ----
+# File: modules/vpc/main.tf
+
+resource "aws_vpc" "main" {
+  cidr_block = var.vpc_cidr
+
+  tags = merge(var.common_tags, {
+    Name = "${var.project_name}-vpc"
+  })
+}
+
+resource "aws_subnet" "public" {
+  count             = length(var.public_subnet_cidrs)
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = var.public_subnet_cidrs[count.index]
+  availability_zone = var.subnet_availability_zones[count.index]
+
+  tags = merge(var.common_tags, {
+    Name = "${var.project_name}-public-subnet-${count.index}"
+  })
+}
+
+resource "aws_subnet" "private" {
+  count             = length(var.private_subnet_cidrs)
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = var.private_subnet_cidrs[count.index]
+  availability_zone = var.subnet_availability_zones[count.index]
+
+  tags = merge(var.common_tags, {
+    Name = "${var.project_name}-private-subnet-${count.index}"
+  })
+}
+
+resource "aws_db_subnet_group" "db_subnet_group" {
+  name       = var.subnet_group_name
+  subnet_ids = aws_subnet.private[*].id
+  tags       = var.common_tags
+}
+
+output "vpc_id" {
+  value = aws_vpc.main.id
+}
+
+output "public_subnet_ids" {
+  value = aws_subnet.public[*].id
+}
+
+output "private_subnet_ids" {
+  value = aws_subnet.private[*].id
+}
+
+output "subnet_group_name" {
+  value = aws_db_subnet_group.db_subnet_group.name
+}
+
+# ---- MODULE: RDS ----
+# File: modules/rds/main.tf
+
+resource "aws_security_group" "rds_sg" {
+  name        = "rds-sg"
+  vpc_id      = var.vpc_id
+  description = "Allow DB access from WordPress"
+
+  tags = var.common_tags
+}
+
+resource "aws_db_instance" "database" {
+  allocated_storage    = 20
+  db_name              = var.db_name
+  engine               = "mysql"
+  engine_version       = "8.0"
+  instance_class       = "db.t3.micro"
+  username             = var.db_user
+  password             = var.db_pass
+  db_subnet_group_name = var.subnet_group_name
+  vpc_security_group_ids = [aws_security_group.rds_sg.id]
+  skip_final_snapshot  = true
+  publicly_accessible  = false
+  tags                 = var.common_tags
+}
+
+output "rds_endpoint" {
+  value = aws_db_instance.database.address
+}
+
+output "rds_sg_id" {
+  value = aws_security_group.rds_sg.id
+}
+
+# ---- MODULE: VAULT ----
+# File: modules/vault/main.tf
+
+resource "aws_security_group" "vault_sg" {
+  name   = "vault-sg"
+  vpc_id = var.vpc_id
+
+  ingress {
+    from_port   = 8200
+    to_port     = 8200
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # For dev/demo, restrict in production
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = var.common_tags
+}
+
+data "aws_ami" "ubuntu" {
+  most_recent = true
+  owners      = [var.ami_onwer_id]
+  filter {
+    name   = "name"
+    values = [var.ami_name_filter]
+  }
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
+resource "aws_instance" "vault" {
+  ami                    = data.aws_ami.ubuntu.id
+  instance_type          = var.instance_type
+  subnet_id              = var.subnet_id
+  vpc_security_group_ids = [aws_security_group.vault_sg.id]
+  key_name               = var.key_name
+
+  user_data = templatefile("${path.module}/../../user_data/vault-user-data.sh.tpl", {
+    db_user = var.db_user,
+    db_pass = var.db_pass,
+    db_host = var.db_host
+  })
+
+  tags = var.common_tags
+}
+
+output "vault_private_ip" {
+  value = aws_instance.vault.private_ip
+}
+
+# ---- MODULE: WORDPRESS ----
+# File: modules/wordpress/main.tf
+
+resource "aws_security_group" "wp_sg" {
+  name   = "wordpress-sg"
+  vpc_id = var.vpc_id
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = var.common_tags
+}
+
+data "aws_ami" "ubuntu" {
+  most_recent = true
+  owners      = [var.ami_onwer_id]
+  filter {
+    name   = "name"
+    values = [var.ami_name_filter]
+  }
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
+resource "aws_instance" "wordpress" {
+  ami                    = data.aws_ami.ubuntu.id
+  instance_type          = var.instance_type
+  subnet_id              = var.subnet_id
+  vpc_security_group_ids = [aws_security_group.wp_sg.id]
+  key_name               = var.key_name
+
+  user_data = templatefile("${path.module}/../../user_data/wordpress-user-data.sh.tpl", {
+    vault_ip = var.vault_ip
+  })
+
+  tags = var.common_tags
+}
+
+output "wordpress_public_ip" {
+  value = aws_instance.wordpress.public_ip
+}
+
+output "wordpress_sg_id" {
+  value = aws_security_group.wp_sg.id
+}
