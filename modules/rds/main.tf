@@ -11,7 +11,7 @@ resource "aws_security_group" "rds_sg" {
   )
 }
 
-resource "aws_vpc_security_group_ingress_rule" "rds_3306" {
+resource "aws_vpc_security_group_ingress_rule" "wp_to_rds" {
   security_group_id            = aws_security_group.rds_sg.id
   referenced_security_group_id = var.wordpress_sg_id # This is the security group ID of the WordPress application
   from_port                    = 3306
@@ -21,20 +21,24 @@ resource "aws_vpc_security_group_ingress_rule" "rds_3306" {
   tags = merge(
     var.common_tags,
     {
-      Name = "${var.project_name}-rds-3306-rule"
+      Name = "${var.project_name}-wp_to_rds-rule"
     }
   )
 }
 
-resource "random_string" "db_username" {
-  length  = 8
-  upper   = false
-  special = false
-}
-resource "random_password" "db_password" {
-  length           = 16
-  override_special = "_!%^"
-  special          = true
+resource "aws_vpc_security_group_ingress_rule" "vault_to_rds" {
+  security_group_id            = aws_security_group.rds_sg.id
+  referenced_security_group_id = var.vault_sg_id # This is the security group ID of the WordPress application
+  from_port                    = 3306
+  ip_protocol                  = "tcp"
+  to_port                      = 3306
+
+  tags = merge(
+    var.common_tags,
+    {
+      Name = "${var.project_name}-vault_to_rds-rule"
+    }
+  )
 }
 
 resource "aws_db_instance" "database" {
@@ -43,8 +47,8 @@ resource "aws_db_instance" "database" {
   engine                 = "mysql"
   engine_version         = "8.0"
   instance_class         = "db.t3.micro"
-  username               = random_string.db_username.result
-  password               = random_password.db_password.result
+  username               = var.db_user
+  password               = var.db_pass
   db_subnet_group_name   = var.subnet_group_name
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
   skip_final_snapshot    = true

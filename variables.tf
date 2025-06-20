@@ -34,12 +34,48 @@ variable "project_name" {
 
 }
 
+variable "private_key_path" {
+  description = "Path to the private key file for SSH access"
+  type        = string
+
+}
+
+variable "db_user" {
+  description = "Username for the RDS database"
+  type        = string
+
+}
+
+variable "db_pass" {
+  description = "Password for the RDS database"
+  type        = string
+  sensitive   = true
+
+}
+
+variable "ami_owner_id" {
+  description = "Owner ID for the AMI"
+  type        = string
+
+}
+
+variable "ami_name_filter" {
+  description = "Name filter for the AMI"
+  type        = string
+
+}
+
+variable "instance_type" {
+  description = "Instance type for the EC2 instance"
+  type        = string
+
+}
+
 variable "db_name" {
   description = "Name of the RDS database"
   type        = string
 
 }
-
 
 
 

@@ -9,7 +9,56 @@ module "vpc" {
   common_tags               = var.common_tags
 }
 
+module "jumpbox" {
+  source          = "./modules/jumpbox"
+  vpc_id          = module.vpc.vpc_id
+  common_tags     = var.common_tags
+  project_name    = var.project_name
+  ami_name_filter = var.ami_name_filter
+  ami_owner_id    = var.ami_owner_id
+  instance_type   = var.instance_type
+  subnet_id       = module.vpc.public_subnet_ids[0]
+}
 
+module "rds" {
+  source            = "./modules/rds"
+  vpc_id            = module.vpc.vpc_id
+  common_tags       = var.common_tags
+  project_name      = var.project_name
+  wordpress_sg_id   = module.wordpress.wordpress_sg_id
+  vault_sg_id       = module.vault.vault_sg_id
+  db_name           = var.db_name
+  db_user           = var.db_user
+  db_pass           = var.db_pass
+  subnet_group_name = module.vpc.subnet_group_name
+}
+
+module "vault" {
+  source          = "./modules/vault"
+  vpc_id          = module.vpc.vpc_id
+  common_tags     = var.common_tags
+  project_name    = var.project_name
+  ami_name_filter = var.ami_name_filter
+  ami_owner_id    = var.ami_owner_id
+  instance_type   = var.instance_type
+  subnet_id       = module.vpc.private_subnet_ids[0]
+  db_pass         = var.db_pass
+  db_user         = var.db_user
+}
+
+module "wordpress" {
+  source           = "./modules/wordpress"
+  vpc_id           = module.vpc.vpc_id
+  common_tags      = var.common_tags
+  project_name     = var.project_name
+  ami_name_filter  = var.ami_name_filter
+  ami_owner_id     = var.ami_owner_id
+  instance_type    = var.instance_type
+  subnet_id        = module.vpc.public_subnet_ids[0]
+  vault_private_ip = module.vault.vault_private_ip
+  db_host          = module.rds.rds_endpoint
+  db_name          = var.db_name
+}
 
 
 

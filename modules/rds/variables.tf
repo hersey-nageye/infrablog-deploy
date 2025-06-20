@@ -22,8 +22,8 @@ variable "wordpress_sg_id" {
 
 }
 
-variable "db_name" {
-  description = "Name of the RDS database"
+variable "vault_sg_id" {
+  description = "Security group ID for the Vault instance"
   type        = string
 
 }
@@ -37,5 +37,18 @@ variable "subnet_group_name" {
 variable "db_name" {
   description = "Name of the RDS database"
   type        = string
+
+}
+
+variable "db_user" {
+  description = "Username for the RDS database"
+  type        = string
+
+}
+
+variable "db_pass" {
+  description = "Password for the RDS database"
+  type        = string
+  sensitive   = true
 
 }
