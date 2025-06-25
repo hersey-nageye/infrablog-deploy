@@ -9,24 +9,13 @@ module "vpc" {
   common_tags               = var.common_tags
 }
 
-module "jumpbox" {
-  source          = "./modules/jumpbox"
-  vpc_id          = module.vpc.vpc_id
-  common_tags     = var.common_tags
-  project_name    = var.project_name
-  ami_name_filter = var.ami_name_filter
-  ami_owner_id    = var.ami_owner_id
-  instance_type   = var.instance_type
-  subnet_id       = module.vpc.public_subnet_ids[0]
-}
-
 module "rds" {
   source            = "./modules/rds"
   vpc_id            = module.vpc.vpc_id
   common_tags       = var.common_tags
   project_name      = var.project_name
-  wordpress_sg_id   = module.wordpress.wordpress_sg_id
-  vault_sg_id       = module.vault.vault_sg_id
+  wordpress_sg_id   = module.vault.wordpress_security_group_id
+  vault_sg_id       = module.vault.vault_security_group_id
   db_name           = var.db_name
   db_user           = var.db_user
   db_pass           = var.db_pass
@@ -36,28 +25,32 @@ module "rds" {
 module "vault" {
   source          = "./modules/vault"
   vpc_id          = module.vpc.vpc_id
-  common_tags     = var.common_tags
-  project_name    = var.project_name
-  ami_name_filter = var.ami_name_filter
-  ami_owner_id    = var.ami_owner_id
+  subnet_id       = module.vpc.public_subnet_ids[0]
   instance_type   = var.instance_type
-  subnet_id       = module.vpc.private_subnet_ids[0]
-  db_pass         = var.db_pass
   db_user         = var.db_user
+  db_pass         = var.db_pass
+  ami_owner_id    = var.ami_owner_id
+  ami_name_filter = var.ami_name_filter
+  project_name    = var.project_name
+  common_tags     = var.common_tags
 }
 
 module "wordpress" {
   source           = "./modules/wordpress"
   vpc_id           = module.vpc.vpc_id
-  common_tags      = var.common_tags
-  project_name     = var.project_name
-  ami_name_filter  = var.ami_name_filter
-  ami_owner_id     = var.ami_owner_id
-  instance_type    = var.instance_type
   subnet_id        = module.vpc.public_subnet_ids[0]
+  wordpress_sg_id  = module.vault.wordpress_security_group_id
+  instance_type    = var.instance_type
   vault_private_ip = module.vault.vault_private_ip
   db_host          = module.rds.rds_endpoint
   db_name          = var.db_name
+  ami_owner_id     = var.ami_owner_id
+  ami_name_filter  = var.ami_name_filter
+  project_name     = var.project_name
+  common_tags      = var.common_tags
+
+  # New dependency variable
+  vault_ready_trigger = module.vault.vault_ready_trigger
 }
 
 

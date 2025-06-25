@@ -57,3 +57,15 @@ variable "db_name" {
   type        = string
 
 }
+
+variable "vault_ready_trigger" {
+  description = "Trigger to indicate when the Vault instance is ready"
+  type        = string
+
+}
+
+variable "wordpress_sg_id" {
+  description = "Security group ID for the WordPress instance"
+  type        = string
+
+}
