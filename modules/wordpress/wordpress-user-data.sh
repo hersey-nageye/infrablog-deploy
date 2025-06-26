@@ -3,9 +3,9 @@ exec > >(tee /var/log/wp-setup.log | logger -t wp-setup) 2>&1
 set -euxo pipefail
 
 # Environment variables passed via Terraform templatefile()
-DB_NAME="${db_name}"
-DB_USER="${db_user}"
-DB_PASSWORD="${db_password}"
+DB_NAME="${DB_NAME}"
+DB_USER="${DB_USER}"
+DB_PASSWORD="${DB_PASSWORD}"
 
 # Update and install packages
 apt update -y
