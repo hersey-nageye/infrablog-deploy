@@ -3,11 +3,13 @@ name: Terraform Deployment
 on:
   push:
     branches:
-      - refactor/simplified-challenge
+      - refactor/simplified-challenge  # Replace with your working branch
 
 jobs:
   terraform:
     runs-on: ubuntu-latest
+
+    # 🔐 Make sure these secrets exist in GitHub > Settings > Secrets and variables > Actions
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -17,17 +19,19 @@ jobs:
       TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
 
     steps:
-      - name: Checkout code
+      - name: 📥 Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Terraform
+      - name: 🛠 Set up Terraform
         uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.6.6  # Optional: use the version your project uses
 
-      - name: Terraform Init
+      - name: 🌱 Terraform Init
         run: terraform init
 
-      - name: Terraform Plan
+      - name: 📋 Terraform Plan
         run: terraform plan
 
-      - name: Terraform Apply
+      - name: 🚀 Terraform Apply
         run: terraform apply -auto-approve
