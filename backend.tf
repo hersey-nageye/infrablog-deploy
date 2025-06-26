@@ -1,10 +1,9 @@
 terraform {
   backend "s3" {
-    bucket       = "wordpress-project-tf-state"
-    key          = "terraform.tfstate"
-    region       = "eu-west-2"
-    encrypt      = true
-    use_lockfile = true
+    bucket  = "wordpress-project-tf-state"
+    key     = "terraform.tfstate"
+    region  = "eu-west-2"
+    encrypt = true
   }
 }
 
