@@ -17,17 +17,6 @@ resource "aws_subnet" "public" {
   })
 }
 
-resource "aws_subnet" "private" {
-  count             = length(var.private_subnet_cidrs)
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = var.private_subnet_cidrs[count.index]
-  availability_zone = var.subnet_availability_zones[count.index]
-
-  tags = merge(var.common_tags, {
-    Name = "${var.project_name}-private-subnet-${count.index}"
-  })
-}
-
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
   tags = merge(
@@ -58,20 +47,4 @@ resource "aws_route_table_association" "public_rta" {
   count          = length(aws_subnet.public)
   subnet_id      = aws_subnet.public[count.index].id
   route_table_id = aws_route_table.public_rt.id
-}
-
-resource "aws_route_table" "private_rt" {
-  vpc_id = aws_vpc.main.id
-  tags = merge(
-    var.common_tags,
-    {
-      Name = "${var.project_name}-private-route-table"
-    }
-  )
-}
-
-resource "aws_route_table_association" "private_rta" {
-  count          = length(aws_subnet.private)
-  subnet_id      = aws_subnet.private[count.index].id
-  route_table_id = aws_route_table.private_rt.id
 }

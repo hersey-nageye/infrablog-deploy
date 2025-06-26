@@ -1,55 +1,48 @@
 #!/bin/bash
+exec > >(tee /var/log/wp-setup.log | logger -t wp-setup) 2>&1
+set -euxo pipefail
 
-# Install required packages
+# Environment variables passed via Terraform templatefile()
+DB_NAME="${db_name}"
+DB_USER="${db_user}"
+DB_PASSWORD="${db_password}"
+
+# Update and install packages
 apt update -y
-apt install apache2 php php-mysql php-curl php-gd php-xml php-zip mysql-server wget unzip jq curl -y
+apt install -y apache2 php php-mysql php-curl php-gd php-xml php-zip mysql-server wget unzip jq curl
 
-# Remove default Apache page
+# Remove default Apache index page
 rm -f /var/www/html/index.html
 
-# Download and install WordPress
+# Enable Apache modules
+a2enmod rewrite
+systemctl enable apache2
+systemctl start apache2
+
+# Configure Apache to allow .htaccess overrides
+sed -i 's/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
+systemctl restart apache2
+
+# Download and extract WordPress
 cd /tmp
 wget https://wordpress.org/latest.tar.gz
 tar -xzf latest.tar.gz
 cp -r wordpress/* /var/www/html/
 rm -rf wordpress latest.tar.gz
 
-# Function to get credentials from Vault
-get_vault_credentials() {
-    local vault_addr="${vault_addr}"
-    local vault_token
-    
-    # Get Vault token using userpass auth
-    vault_token=$(curl -s -X POST \
-        -H "Content-Type: application/json" \
-        -d "{\"password\":\"${wp_vault_password}\"}" \
-        "$vault_addr/v1/auth/userpass/login/wordpress" | jq -r '.auth.client_token')
-    
-    # Get WordPress credentials from Vault
-    local creds=$(curl -s -H "X-Vault-Token: $vault_token" \
-        "$vault_addr/v1/secret/data/wordpress" | jq -r '.data.data')
-    
-    DB_NAME=$(echo $creds | jq -r '.db_name')
-    DB_USER=$(echo $creds | jq -r '.db_user')
-    DB_PASSWORD=$(echo $creds | jq -r '.db_password')
-}
-
-# Get credentials from Vault
-get_vault_credentials
-
-# Set up MySQL
-mysql -e "CREATE DATABASE $DB_NAME DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-mysql -e "CREATE USER '$DB_USER'@'localhost' IDENTIFIED BY '$DB_PASSWORD';"
-mysql -e "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'localhost';"
+# Create the MySQL DB and user
+mysql -e "CREATE DATABASE IF NOT EXISTS ${db_name} DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+mysql -e "CREATE USER IF NOT EXISTS '${db_user}'@'localhost' IDENTIFIED BY '${db_password}';"
+mysql -e "GRANT ALL PRIVILEGES ON ${db_name}.* TO '${db_user}'@'localhost';"
 mysql -e "FLUSH PRIVILEGES;"
 
-# Create wp-config.php
+# Configure wp-config.php
 cp /var/www/html/wp-config-sample.php /var/www/html/wp-config.php
-sed -i "s/database_name_here/$DB_NAME/" /var/www/html/wp-config.php
-sed -i "s/username_here/$DB_USER/" /var/www/html/wp-config.php
-sed -i "s/password_here/$DB_PASSWORD/" /var/www/html/wp-config.php
+sed -i "s/database_name_here/${db_name}/" /var/www/html/wp-config.php
+sed -i "s/username_here/${db_user}/" /var/www/html/wp-config.php
+sed -i "s/password_here/${db_password}/" /var/www/html/wp-config.php
 
-# Add WordPress salt keys
+# Add WordPress security salts
 curl -s https://api.wordpress.org/secret-key/1.1/salt/ > /tmp/wp-salt.txt
 sed -i '/put your unique phrase here/r /tmp/wp-salt.txt' /var/www/html/wp-config.php
 sed -i '/put your unique phrase here/d' /var/www/html/wp-config.php
@@ -59,15 +52,7 @@ rm /tmp/wp-salt.txt
 chown -R www-data:www-data /var/www/html
 chmod -R 755 /var/www/html
 
-# Enable mod_rewrite
-a2enmod rewrite
-
-# Update Apache config for WordPress
-sed -i 's/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
-
-# Restart Apache
+# Final restart
 systemctl restart apache2
 
-echo "WordPress setup complete!"
-echo "Database: $DB_NAME"
-echo "User: $DB_USER"
+echo "✅ WordPress setup completed successfully."

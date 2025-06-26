@@ -8,11 +8,6 @@ variable "public_subnet_cidrs" {
   type        = list(string)
 }
 
-variable "private_subnet_cidrs" {
-  description = "List of CIDR blocks for private subnets"
-  type        = list(string)
-}
-
 variable "subnet_availability_zones" {
   description = "List of availability zones to use for subnets"
   type        = list(string)
@@ -52,7 +47,7 @@ variable "db_name" {
   type        = string
 }
 
-variable "db_username" {
+variable "db_user" {
   description = "Username of the database"
   type        = string
 }
@@ -63,27 +58,6 @@ variable "db_password" {
   sensitive   = true
 }
 
-variable "wp_admin_user" {
-  description = "Admin user"
-  type        = string
-}
-
-variable "wp_admin_password" {
-  description = "Admin password"
-  type        = string
-  sensitive   = true
-}
-
-variable "wp_admin_email" {
-  description = "Admin email"
-  type        = string
-}
-
-variable "wp_vault_password" {
-  description = "Password for vault instance to access vault"
-  type        = string
-  sensitive   = true
-}
 
 
 

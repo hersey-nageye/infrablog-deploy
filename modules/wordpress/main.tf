@@ -81,8 +81,9 @@ resource "aws_instance" "wordpress" {
   }
 
   user_data = templatefile("${path.module}/wordpress-user-data.sh", {
-    vault_addr        = "http://${var.vault_private_ip}:8200"
-    wp_vault_password = var.wp_vault_password
+    db_name     = var.db_name
+    db_user     = var.db_user
+    db_password = var.db_password
   })
 
   tags = merge(

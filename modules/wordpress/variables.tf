@@ -45,37 +45,13 @@ variable "db_name" {
   type        = string
 }
 
-variable "db_username" {
-  description = "Username of the database"
+variable "db_user" {
+  description = "Database username"
   type        = string
 }
 
 variable "db_password" {
   description = "Password of the database"
   type        = string
-}
-
-variable "wp_admin_user" {
-  description = "Admin user"
-  type        = string
-}
-
-variable "wp_admin_password" {
-  description = "Admin password"
-  type        = string
-}
-
-variable "wp_admin_email" {
-  description = "Admin email"
-  type        = string
-}
-
-variable "wp_vault_password" {
-  description = "Password"
-  type        = string
-}
-
-variable "vault_private_ip" {
-  description = "Private IP of vault instance"
-  type        = string
+  sensitive   = true
 }
