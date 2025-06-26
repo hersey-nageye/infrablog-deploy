@@ -3,12 +3,15 @@ name: Terraform Deployment
 on:
   push:
     branches:
-      - refactor/simplified-challenge  # or your preferred branch
+      - refactor/simplified-challenge
 
 jobs:
   terraform:
     runs-on: ubuntu-latest
     env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: eu-west-2
       TF_VAR_db_name: ${{ secrets.DB_NAME }}
       TF_VAR_db_user: ${{ secrets.DB_USER }}
       TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
