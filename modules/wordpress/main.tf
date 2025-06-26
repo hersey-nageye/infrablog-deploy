@@ -81,9 +81,9 @@ resource "aws_instance" "wordpress" {
   }
 
   user_data = templatefile("${path.module}/wordpress-user-data.sh", {
-    DB_NAME     = var.db_name
-    DB_USER     = var.db_user
-    DB_PASSWORD = var.db_password
+    DB_NAME     = "wordpressdb"
+    DB_USER     = "wp_user"
+    DB_PASSWORD = "StrongPassword123!"
   })
 
   user_data_replace_on_change = true
