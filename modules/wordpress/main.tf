@@ -86,6 +86,8 @@ resource "aws_instance" "wordpress" {
     db_password = var.db_password
   })
 
+  user_data_replace_on_change = true
+
   tags = merge(
     var.common_tags,
     {
