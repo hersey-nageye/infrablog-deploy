@@ -40,32 +40,42 @@ variable "instance_type" {
 
 }
 
-variable "vault_private_ip" {
-  description = "Private IP address for the Vault instance"
-  type        = string
-
-}
-
-variable "db_host" {
-  description = "Hostname for the RDS database"
-  type        = string
-
-}
-
 variable "db_name" {
-  description = "Name of the RDS database"
+  description = "Name of the database"
   type        = string
-
 }
 
-variable "vault_ready_trigger" {
-  description = "Trigger to indicate when the Vault instance is ready"
+variable "db_username" {
+  description = "Username of the database"
   type        = string
-
 }
 
-variable "wordpress_sg_id" {
-  description = "Security group ID for the WordPress instance"
+variable "db_password" {
+  description = "Password of the database"
   type        = string
+}
 
+variable "wp_admin_user" {
+  description = "Admin user"
+  type        = string
+}
+
+variable "wp_admin_password" {
+  description = "Admin password"
+  type        = string
+}
+
+variable "wp_admin_email" {
+  description = "Admin email"
+  type        = string
+}
+
+variable "wp_vault_password" {
+  description = "Password"
+  type        = string
+}
+
+variable "vault_private_ip" {
+  description = "Private IP of vault instance"
+  type        = string
 }

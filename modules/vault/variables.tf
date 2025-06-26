@@ -35,15 +35,30 @@ variable "subnet_id" {
 
 }
 
-variable "db_user" {
-  description = "The username for the database."
+variable "jumpbox_sg_id" {
+  description = "The ID of the security group for the jumpbox instance."
   type        = string
 
 }
 
-variable "db_pass" {
-  description = "The password for the database."
+variable "db_name" {
+  description = "Name of the database"
+  type        = string
+}
+
+variable "db_username" {
+  description = "Username of database"
+  type        = string
+}
+
+variable "db_password" {
+  description = "Password for database"
   type        = string
   sensitive   = true
+}
 
+variable "wp_vault_password" {
+  description = "Password for wordpress isstance to access vault"
+  type        = string
+  sensitive   = true
 }

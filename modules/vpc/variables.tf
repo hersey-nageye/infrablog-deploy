@@ -18,11 +18,6 @@ variable "subnet_availability_zones" {
   type        = list(string)
 }
 
-variable "subnet_group_name" {
-  description = "Name for the RDS subnet group"
-  type        = string
-}
-
 variable "common_tags" {
   description = "Common tags to apply to all resources"
   type        = map(string)

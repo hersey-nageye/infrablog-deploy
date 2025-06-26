@@ -8,12 +8,6 @@
 *.tfvars
 .env
 
-# Vault token
-wordpress-token.txt
-
 # Keys
 *.pem
 *.key
-
-# DB setup script (contains password)
-create-wordpress-db.sql

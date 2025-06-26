@@ -18,11 +18,6 @@ variable "subnet_availability_zones" {
   type        = list(string)
 }
 
-variable "subnet_group_name" {
-  description = "Name for the RDS subnet group"
-  type        = string
-}
-
 variable "common_tags" {
   description = "Common tags to apply to all resources"
   type        = map(string)
@@ -31,25 +26,6 @@ variable "common_tags" {
 variable "project_name" {
   description = "Name of the project, used for tagging resources"
   type        = string
-
-}
-
-variable "private_key_path" {
-  description = "Path to the private key file for SSH access"
-  type        = string
-
-}
-
-variable "db_user" {
-  description = "Username for the RDS database"
-  type        = string
-
-}
-
-variable "db_pass" {
-  description = "Password for the RDS database"
-  type        = string
-  sensitive   = true
 
 }
 
@@ -72,11 +48,42 @@ variable "instance_type" {
 }
 
 variable "db_name" {
-  description = "Name of the RDS database"
+  description = "Name of the database"
   type        = string
-
 }
 
+variable "db_username" {
+  description = "Username of the database"
+  type        = string
+}
+
+variable "db_password" {
+  description = "Password of the database"
+  type        = string
+  sensitive   = true
+}
+
+variable "wp_admin_user" {
+  description = "Admin user"
+  type        = string
+}
+
+variable "wp_admin_password" {
+  description = "Admin password"
+  type        = string
+  sensitive   = true
+}
+
+variable "wp_admin_email" {
+  description = "Admin email"
+  type        = string
+}
+
+variable "wp_vault_password" {
+  description = "Password for vault instance to access vault"
+  type        = string
+  sensitive   = true
+}
 
 
 

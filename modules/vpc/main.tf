@@ -28,14 +28,6 @@ resource "aws_subnet" "private" {
   })
 }
 
-resource "aws_db_subnet_group" "db_subnet_group" {
-  name       = var.subnet_group_name
-  subnet_ids = aws_subnet.private[*].id
-  tags = merge(var.common_tags, {
-    Name = "${var.project_name}-db-subnet-group"
-  })
-}
-
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
   tags = merge(
