@@ -31,16 +31,16 @@ cp -r wordpress/* /var/www/html/
 rm -rf wordpress latest.tar.gz
 
 # Create the MySQL DB and user
-mysql -e "CREATE DATABASE IF NOT EXISTS $/{DB_NAME} DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-mysql -e "CREATE USER IF NOT EXISTS '$/{DB_NAME}'@'localhost' IDENTIFIED BY '$/{DB_PASSWORD}';"
-mysql -e "GRANT ALL PRIVILEGES ON $/{DB_NAME}.* TO '$/{DB_USER}'@'localhost';"
+mysql -e "CREATE DATABASE IF NOT EXISTS ${DB_NAME} DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+mysql -e "CREATE USER IF NOT EXISTS '${DB_NAME}'@'localhost' IDENTIFIED BY '${DB_PASSWORD}';"
+mysql -e "GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'localhost';"
 mysql -e "FLUSH PRIVILEGES;"
 
 # Configure wp-config.php
 cp /var/www/html/wp-config-sample.php /var/www/html/wp-config.php
-sed -i "s/database_name_here/$/{DB_NAME}/" /var/www/html/wp-config.php
-sed -i "s/username_here/$/{DB_USER}/" /var/www/html/wp-config.php
-sed -i "s/password_here/$/{DB_PASSWORD}/" /var/www/html/wp-config.php
+sed -i "s/database_name_here/${DB_NAME}/" /var/www/html/wp-config.php
+sed -i "s/username_here/${DB_USER}/" /var/www/html/wp-config.php
+sed -i "s/password_here/${DB_PASSWORD}/" /var/www/html/wp-config.php
 
 # Add WordPress security salts
 curl -s https://api.wordpress.org/secret-key/1.1/salt/ > /tmp/wp-salt.txt
