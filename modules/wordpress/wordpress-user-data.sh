@@ -68,4 +68,4 @@ chmod -R 755 /var/www/html
 echo "Restarting Apache..."
 systemctl restart apache2
 
-echo "✅ WordPress setup completed successfully."
+echo "WordPress setup completed successfully."

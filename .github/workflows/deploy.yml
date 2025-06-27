@@ -10,43 +10,43 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📥 Checkout repository
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: 🔐 Configure AWS credentials
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-2
 
-      - name: 🔍 Test AWS access
+      - name: Test AWS access
         run: |
           echo "Testing AWS credentials..."
           aws sts get-caller-identity
           echo "Testing S3 bucket access..."
           aws s3 ls s3://wordpress-project-tf-state/ || echo "Cannot access S3 bucket"
 
-      - name: 🛠 Set up Terraform
+      - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.6.6
 
-      - name: 🌱 Terraform Init
+      - name: Terraform Init
         env:
           TF_VAR_db_name: ${{ secrets.DB_NAME }}
           TF_VAR_db_user: ${{ secrets.DB_USER }}
           TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
         run: terraform init
 
-      - name: 📋 Terraform Plan
+      - name: Terraform Plan
         env:
           TF_VAR_db_name: ${{ secrets.DB_NAME }}
           TF_VAR_db_user: ${{ secrets.DB_USER }}
           TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
         run: terraform plan -var-file="terraform.tfvars" -input=false
 
-      - name: 🚀 Terraform Apply
+      - name: Terraform Apply
         env:
           TF_VAR_db_name: ${{ secrets.DB_NAME }}
           TF_VAR_db_user: ${{ secrets.DB_USER }}

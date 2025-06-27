@@ -7,4 +7,3 @@ terraform {
   }
 }
 
-// This file configures the backend for Terraform state management.
