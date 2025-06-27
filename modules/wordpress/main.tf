@@ -80,7 +80,7 @@ resource "aws_instance" "wordpress" {
     ignore_changes = [ami]
   }
 
-  user_data = templatefile("~/Projects/wordpress-project/modules/wordpress/wordpress-user-data.sh", {
+  user_data = templatefile("${path.module}/wordpress-user-data.sh", {
     DB_NAME     = var.db_name
     DB_USER     = var.db_user
     DB_PASSWORD = var.db_password
