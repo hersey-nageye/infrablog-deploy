@@ -9,5 +9,5 @@ output "rendered_user_data" {
   description = "The fully rendered user_data script for debugging purposes."
   # IMPORTANT: Remove 'sensitive = true' temporarily to see the actual values.
   # Remember to add it back once you're done debugging!
-  # sensitive   = true
+  #   sensitive = true
 }
