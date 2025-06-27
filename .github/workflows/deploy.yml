@@ -3,7 +3,7 @@ name: Terraform Deployment
 on:
   push:
     branches:
-      - refactor/simplified-challenge
+      - main
 
 jobs:
   terraform:
