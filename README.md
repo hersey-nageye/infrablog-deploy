@@ -66,7 +66,7 @@ First, clone this repository to your local machine:
 
 ```
 git clone https://github.com/hersey-nageye/wordpress-project.git
-cd YOUR_REPOSITORY_NAME
+cd wordpress-project
 ```
 
 ### 2. Configure AWS Credentials
