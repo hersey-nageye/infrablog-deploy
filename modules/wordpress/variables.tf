@@ -43,17 +43,14 @@ variable "instance_type" {
 variable "db_name" {
   description = "Name of the database"
   type        = string
-  sensitive   = true
 }
 
 variable "db_user" {
   description = "Database username"
   type        = string
-  sensitive   = true
 }
 
 variable "db_password" {
   description = "Password of the database"
   type        = string
-  sensitive   = true
 }
