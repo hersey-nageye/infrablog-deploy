@@ -1,7 +1,7 @@
 
 # outputs.tf in your root Terraform directory
 output "rendered_user_data" {
-  value = templatefile("${path.module}/wordpress-user-data.sh", {
+  value = templatefile("~/Projects/wordpress-project/modules/wordpress/wordpress-user-data.sh", {
     DB_NAME     = var.db_name
     DB_USER     = var.db_user
     DB_PASSWORD = var.db_password
