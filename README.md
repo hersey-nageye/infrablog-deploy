@@ -1,4 +1,4 @@
-# Infra Deploy - WordPress Deployment with Terraform and GitHub Actions
+# InfraBlog Deploy - WordPress Deployment with Terraform and GitHub Actions
 
 This project demonstrates how to deploy a WordPress website on AWS EC2 using Infrastructure as Code (IaC) with [Terraform](https://www.terraform.io/) and automate the deployment process using [GitHub Actions](https://docs.github.com/en/actions).
 
